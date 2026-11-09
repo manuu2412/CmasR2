@@ -37,11 +37,11 @@ function report(r,d,user){
   p.h("Resultados y calificación");
   const xs=[40,190,250,310,370,555];
   p.row(["Escala","PD","PT","PC","Categoría Dx"],xs,{f:"b",bg:"#e3eef0"});
-  CORE.ORD.forEach(k=>p.row([N[k],r.pd[k],r.pt[k]??"—",r.pc[k]??"—",r.cats[k]],xs));
+  CORE.ORD.forEach(k=>p.row([N[k],r.pd[k],r.ptf[k],r.pc[k]??"—",r.cats[k]],xs));
   p.row(["Inconsistencia",r.inc,"—","—","El test es "+(r.valido?"válido":"inválido")],xs);
   p.para("PD = puntuación directa · PT = puntuación T · PC = percentil. Categoría: Bajo (PT hasta 40), Leve (41–50), Moderado (51–60), Elevado (61 o más). El test es inválido con 6 o más pares inconsistentes.",{z:8,k:"#4a5b66",gap:2});
   p.h("Interpretación por escala");
-  CORE.ORD.forEach(k=>{p.need(34);p.para(N[k]+" — PT "+(r.pt[k]??"—")+" ("+r.cats[k]+")",{f:"b",gap:0});p.para(r.tx[k].replace(/^./,c=>c.toUpperCase()),{gap:5})});
+  CORE.ORD.forEach(k=>{p.need(34);p.para(N[k]+" — PT "+r.ptf[k]+" ("+r.cats[k]+")",{f:"b",gap:0});p.para(r.tx[k].replace(/^./,c=>c.toUpperCase()),{gap:r.nota[k]?1:5});if(r.nota[k])p.para(r.nota[k],{z:8.5,k:"#4a5b66",gap:5})});
   p.h("Interpretación general");p.para(r.nar(d.nombre),{lh:1.45});
   p.h("Reactivos con indicador por escala");
   ["DEF","FIS","INQ","SOC"].forEach(k=>{p.need(28);p.para(N[k]+" ("+r.items[k].length+")",{f:"b",gap:1});if(!r.items[k].length)p.para("Ninguno.",{x:52,w:500,z:9,gap:3});r.items[k].forEach(([n,a])=>p.para(n+". "+Q[n-1].replace(/^\s+/,"")+" ("+a+")",{x:52,w:500,z:9,gap:0,lh:1.25}));p.y+=4});

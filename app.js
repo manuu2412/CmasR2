@@ -46,8 +46,8 @@ ${DATA.Q.map((q,i)=>`<div class="row" id="r${i+1}"><span class="no">${i+1}</span
 let D0,A0;
 function result({r,d,pdf}){const N=CORE.NOM;
  app.innerHTML=hdr("Resultados")+`<main><h2>${esc(d.nombre)}</h2><p class="sub">${d.edad} años · ${d.sexo} · ${esc(d.grado||"")} · ${esc(d.fecha)} · Baremo ${r.bk.slice(2).replace("-"," a ")}</p>
-<table><thead><tr><th>Escala</th><th>PD</th><th>PT</th><th>PC</th><th>Categoría</th></tr></thead><tbody>${CORE.ORD.map(k=>`<tr><td>${N[k]}</td><td>${r.pd[k]}</td><td>${r.pt[k]??"—"}</td><td>${r.pc[k]??"—"}</td><td><span class="chip c${r.cats[k]}">${r.cats[k]}</span></td></tr>`).join("")}<tr><td>Inconsistencia</td><td>${r.inc}</td><td>—</td><td>—</td><td><span class="chip ${r.valido?"cBajo":"cElevado"}">${r.valido?"Válido":"Inválido"}</span></td></tr></tbody></table>
-<h3>Interpretación</h3>${CORE.ORD.map(k=>`<p><b>${N[k]}:</b> ${esc(r.tx[k])}</p>`).join("")}<h3>Interpretación general</h3><p>${esc(r.nar(d.nombre))}</p>
+<table><thead><tr><th>Escala</th><th>PD</th><th>PT</th><th>PC</th><th>Categoría</th></tr></thead><tbody>${CORE.ORD.map(k=>`<tr><td>${N[k]}</td><td>${r.pd[k]}</td><td>${r.ptf[k]}</td><td>${r.pc[k]??"—"}</td><td><span class="chip c${r.cats[k]}">${r.cats[k]}</span></td></tr>`).join("")}<tr><td>Inconsistencia</td><td>${r.inc}</td><td>—</td><td>—</td><td><span class="chip ${r.valido?"cBajo":"cElevado"}">${r.valido?"Válido":"Inválido"}</span></td></tr></tbody></table>
+<h3>Interpretación</h3>${CORE.ORD.map(k=>`<p><b>${N[k]}:</b> ${esc(r.tx[k])}${r.nota[k]?`<br><small class="sub">${esc(r.nota[k])}</small>`:""}</p>`).join("")}<h3>Interpretación general</h3><p>${esc(r.nar(d.nombre))}</p>
 <div class="foot"><button class="pri big" id="pdf">Descargar PDF</button><button class="sec big" id="ok">Terminar</button></div></main>`;bindOut();
  const dl=()=>bajar(REPORT(r,d,user[0].toUpperCase()+user.slice(1)),nombreArch(d));$("#pdf").onclick=dl;$("#ok").onclick=()=>go("home");if(pdf)setTimeout(dl,300)}
 function hist(){const h=LS.g("c2_hist",[]);
@@ -59,4 +59,5 @@ function hist(){const h=LS.g("c2_hist",[]);
   const rows=h.map(t=>{const r=CORE.score(Object.fromEntries(t.ans.map((a,i)=>[i+1,a])),t.datos.sexo,t.datos.edad);return[t.datos.nombre,t.datos.edad,t.datos.sexo,t.datos.grado,t.datos.fecha,t.user,...K.flatMap(k=>[r.pd[k],r.pt[k],r.pc[k],r.cats[k]]),r.inc,r.valido?"Sí":"No"]});
   bajar("\ufeff"+[hd,...rows].map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\r\n"),"CMASR2_evaluaciones.csv","text/csv;charset=utf-8")}}
 go(user?"home":"login");
-if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+/*SW*/if("serviceWorker"in navigator&&location.protocol.startsWith("http")){const had=!!navigator.serviceWorker.controller;let rl=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!rl){rl=true;location.reload()}});
+addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(!document.hidden)r.update()})}))}/*ENDSW*/
